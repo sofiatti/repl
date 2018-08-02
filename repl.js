@@ -4,8 +4,8 @@ const Token = require('computable/dist/contracts/erc-20').default
 const deployDll = require('computable/dist/helpers').deployDll
 const deployAttributeStore = require('computable/dist/helpers').deployAttributeStore
 const Voting = require('computable/dist/contracts/plcr-voting').default
-// const Parameterizer = require('computable/dist/contracts/parameterizer').default
-// const Registry = require('computable/dist/contracts/registry').default
+const Parameterizer = require('computable/dist/contracts/parameterizer').default
+const Registry = require('computable/dist/contracts/registry').default
 
 // so this shit blew the fuck up... TODO come back to this later
 // const child = require('child_process')
@@ -67,6 +67,26 @@ const setup = async () => {
     dllAddress: replServer.context.dll.options.address,
     attributeStoreAddress: replServer.context.attributeStore.options.address
   }, { gas: GAS_LIMIT, gasPrice: GAS_PRICE })
+
+  // parameterizer
+  replServer.context.dll = await deployDll(replServer.context.web3, replServer.context.admin)
+  replServer.context.attributeStore = await deployAttributeStore(replServer.context.web3, replServer.context.admin)
+  replServer.context.parameterizer = new Parameterizer(replServer.context.admin)
+
+  await replServer.context.parameterizer.deploy(replServer.context.web3, {
+    tokenAddress: replServer.context.token.getAddress(),
+    votingAddress: replServer.context.voting.getAddress()
+  }, { gas: GAS_LIMIT, gasPrice: GAS_PRICE })
+
+  // registry
+  replServer.context.dll = await deployDll(replServer.context.web3, replServer.context.admin)
+  replServer.context.attributeStore = await deployAttributeStore(replServer.context.web3, replServer.context.admin)
+  replServer.context.registry = new Registry(replServer.context.admin)
+
+  await replServer.context.registry.deploy(replServer.context.web3, {
+    tokenAddress: replServer.context.token.getAddress(),
+    votingAddress: replServer.context.voting.getAddress(),
+    parameterizerAddress: replServer.context.parameterizer.getAddress(), name: 'Computable TCR v0.1.0'}, { gas: GAS_LIMIT, gasPrice: GAS_PRICE })
 }
 
 replServer.context.log = promise => {
