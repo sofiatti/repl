@@ -57,36 +57,29 @@ const setup = async () => {
   await replServer.context.token.transfer(replServer.context.user3, ONE_MILLION)
   await replServer.context.token.transfer(replServer.context.user4, ONE_MILLION)
 
-  // voting
   replServer.context.dll = await deployDll(replServer.context.web3, replServer.context.admin)
   replServer.context.attributeStore = await deployAttributeStore(replServer.context.web3, replServer.context.admin)
+  //voting
   replServer.context.voting = new Voting(replServer.context.admin)
-
   await replServer.context.voting.deploy(replServer.context.web3, {
     tokenAddress: replServer.context.token.getAddress(),
     dllAddress: replServer.context.dll.options.address,
     attributeStoreAddress: replServer.context.attributeStore.options.address
   }, { gas: GAS_LIMIT, gasPrice: GAS_PRICE })
-
   // parameterizer
-  replServer.context.dll = await deployDll(replServer.context.web3, replServer.context.admin)
-  replServer.context.attributeStore = await deployAttributeStore(replServer.context.web3, replServer.context.admin)
   replServer.context.parameterizer = new Parameterizer(replServer.context.admin)
-
   await replServer.context.parameterizer.deploy(replServer.context.web3, {
     tokenAddress: replServer.context.token.getAddress(),
     votingAddress: replServer.context.voting.getAddress()
   }, { gas: GAS_LIMIT, gasPrice: GAS_PRICE })
-
   // registry
-  replServer.context.dll = await deployDll(replServer.context.web3, replServer.context.admin)
-  replServer.context.attributeStore = await deployAttributeStore(replServer.context.web3, replServer.context.admin)
   replServer.context.registry = new Registry(replServer.context.admin)
-
   await replServer.context.registry.deploy(replServer.context.web3, {
     tokenAddress: replServer.context.token.getAddress(),
     votingAddress: replServer.context.voting.getAddress(),
-    parameterizerAddress: replServer.context.parameterizer.getAddress(), name: 'Computable TCR v0.1.0'}, { gas: GAS_LIMIT, gasPrice: GAS_PRICE })
+    parameterizerAddress: replServer.context.parameterizer.getAddress(),
+    name: 'Computable TCR v0.1.0'
+  }, { gas: GAS_LIMIT, gasPrice: GAS_PRICE })
 }
 
 replServer.context.log = promise => {
